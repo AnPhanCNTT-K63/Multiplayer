@@ -1,0 +1,2 @@
+- Mỗi người chơi chọn 1 client để chơi.
+- Chạy file.exe hoặc đẩy vào visual studio community để khởi động game.
