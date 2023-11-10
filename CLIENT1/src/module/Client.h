@@ -176,7 +176,6 @@ void multiplayer(Client client, User& player, vector<Computer>& computers, vecto
         string Card = getPath(card);
         int id = getID(card);
         string::iterator it = card.begin();
-        cout << *it << " " << id  << endl;
         if (*it == '1') {
             cout << "Receiving information from server.....VALID CARD, ready to print Card : " << Card << " on screen" << endl;
             historyTemp.push_back(Card);
@@ -207,7 +206,19 @@ void multiplayer(Client client, User& player, vector<Computer>& computers, vecto
             
         }  
         else if (*it == '5') {
+            SDL_RenderClear(gRenderer);
+            SDL_RenderCopy(gRenderer, backgroundTexture, NULL, NULL);
+            for (Computer computer : computers) {
+                computer.printBackCard();
+            }
+            player.printCards();
+            renderHitBtn();
+            renderSkipBtn();
             check2++;
+            if (check2 == 4) {
+                printMyTurnText();
+                check2 = 0;
+            }
             printTurnText(check2);
             SDL_RenderPresent(gRenderer);
         }

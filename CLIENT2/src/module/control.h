@@ -25,41 +25,17 @@ void hitBtnEvent(User &player, vector<Computer> &computers)
         if (player.checkWin())
             player.setPlace();
 
-        if (!player.getIsFinish())
-        {
-            renderHitBtn();         
-             renderSkipBtn();
-            player.printCards();
-        }
-        else
-        {
-            player.printWinner();
-        }
+        
+            renderHitBtn();      
+            renderSkipBtn();
+            player.printCards();              
        // renderAnimationHit(history, player, computers);
         renderHistoryVer2(History);
-        renderHistory(history);
-        
-
-        if (player.getSkip())
-        {
-            player.printSkipText();
-        }
+        renderHistory(history);            
         // print skip text and back cards
         for (Computer computer : computers)
-        {
-            if (!computer.getIsFinish())
-            {
-                computer.printBackCard();
-            }
-            else
-            {
-                computer.printWinner(computer.getId());
-            }
-
-            if (computer.getSkip())
-            {
-                computer.printSkipText(computer.getId());
-            }
+        {         
+             computer.printBackCard();                                
         }
     }
 }
@@ -69,38 +45,18 @@ void renderSelectEvent(User player, vector<Computer> computers)
 {
 
     SDL_RenderClear(gRenderer);
-    SDL_RenderCopy(gRenderer, backgroundTexture, NULL, NULL);
-
-    
-      renderSkipBtn();
-    
+    SDL_RenderCopy(gRenderer, backgroundTexture, NULL, NULL);  
+        renderSkipBtn();
     renderHitBtn();
     renderHistory(history);
     renderHistoryVer2(History);
     
 
     player.printCards();
-
-    if (player.getSkip())
-    {
-        player.printSkipText();
-    }
-
     for (Computer computer : computers)
-    {
-        if (!computer.getIsFinish())
-        {
-            computer.printBackCard();
-        }
-        else
-        {
-            computer.printWinner(computer.getId());
-        }
-
-        if (computer.getSkip())
-        {
-            computer.printSkipText(computer.getId());
-        }
+    {       
+         computer.printBackCard();      
+        
     }
 }
 
