@@ -3,14 +3,14 @@
 void renderHitBtn()
 {
     SDL_Rect destinationRect;
-    destinationRect = { 800, 440, 150, 65 };
+    destinationRect = { 800, 380, 181, 175 };
     SDL_RenderCopy(gRenderer, hitBtnTexture, NULL, &destinationRect);
 }
 
 void renderSkipBtn()
 {
     SDL_Rect destinationRect;
-    destinationRect = { 210, 440, 155, 50 };
+    destinationRect = { 210, 380, 181, 175 };
     SDL_RenderCopy(gRenderer, skipBtnTexture, NULL, &destinationRect);
 }
 void renderAgainBtn()
@@ -81,8 +81,6 @@ void renderAnimationHit(vector<vector<Card>> history, User& player, vector<Compu
                     for (Card& card : history[i]) {
                         SDL_RenderCopy(gRenderer, card.getTexture(), NULL, card.getDestinationRect());
                     }
-
-
                     SDL_RenderPresent(gRenderer);
                     SDL_RenderCopy(gRenderer, backgroundTexture, NULL, NULL);
                     for (Computer& computer : computers) {

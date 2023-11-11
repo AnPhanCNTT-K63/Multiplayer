@@ -3,14 +3,14 @@
 void renderHitBtn()
 {
     SDL_Rect destinationRect;
-    destinationRect = { 800, 440, 150, 65 };
+    destinationRect = { 800, 380, 181, 175 };
     SDL_RenderCopy(gRenderer, hitBtnTexture, NULL, &destinationRect);
 }
 
 void renderSkipBtn()
 {
     SDL_Rect destinationRect;
-    destinationRect = { 210, 440, 155, 50 };
+    destinationRect = { 210, 380, 181, 175 };
     SDL_RenderCopy(gRenderer, skipBtnTexture, NULL, &destinationRect);
 }
 void renderAgainBtn()

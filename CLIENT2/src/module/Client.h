@@ -14,7 +14,8 @@ int Count = 0;
 int check1 = 0;
 int check2 = 3;
 
-class Client {
+class Client
+{
 
 private:
 
@@ -24,82 +25,92 @@ private:
     ENetEvent event;
 
 public:
+    Client() { client = NULL; peer = NULL; }
 
-    unsigned char* getPacketData() {
-        return event.packet->data;
-    }
+    unsigned char* getPacketData() { return event.packet->data; }
 
-    int getID() {
-        return 2;
-    }
+    int getID() { return 2; } // CLIENT 2
 
-    void setPort(int portID) {
-        address.port = portID;
-    }
+    void setPort(int portID) { address.port = portID; }
 
-    void createHost() {
-        client = enet_host_create(NULL, 1, 1, 0, 0);
+    void createHost() { client = enet_host_create(NULL, 1, 1, 0, 0); }
 
-    }
+    void setHost(string IP) { enet_address_set_host(&address, IP.c_str()); }
 
-    void setHost(string IP) {
-        enet_address_set_host(&address, IP.c_str());
-    }
+    void setPeer() { peer = enet_host_connect(client, &address, 1, 0); }
 
-    void setPeer() {
-        peer = enet_host_connect(client, &address, 1, 0);
-    }
+    int setHostService(string types, int time);
 
-    int setHostService(string types, int time) {
-        if (types.c_str() == "CONNECT") {
-            event.type = ENET_EVENT_TYPE_CONNECT;
-        }
-        else if (types.c_str() == "RECEIVE") {
-            event.type = ENET_EVENT_TYPE_RECEIVE;
-        }
-        else if (types.c_str() == "DISCONNECT") {
-            event.type = ENET_EVENT_TYPE_DISCONNECT;
-        }
-        return enet_host_service(client, &event, time);
-    }
+    void sendCardDataToServer(vector<string> cardSendList);
 
-    void sendCardDataToServer(vector<string> cardSendList) {
-        string ID = to_string(getID());
-        for (string& cardPath : cardSendList) {
-            cardPath += ID;
-            string Path = "2" + cardPath;
-            ENetPacket* packet = enet_packet_create(Path.c_str(), Path.length() + 1, ENET_PACKET_FLAG_RELIABLE);
-            enet_peer_send(peer, 0, packet);
-        }
-    }
+    void sendDataWhenSkip();
 
-    void sendDataWhenSkip() {
-        string message = "5aaaaaaaaaaaaaaaaaaaaaaaa5";
-        ENetPacket* packet = enet_packet_create(message.c_str(), message.length() + 1, ENET_PACKET_FLAG_RELIABLE);
-        enet_peer_send(peer, 0, packet);
-    }
-
+    void Destroy();
 };
 
-string getPath(string String) {
+int Client::setHostService(string types, int time)
+{
+    if (types.c_str() == "CONNECT")
+    {
+        event.type = ENET_EVENT_TYPE_CONNECT;
+    }
+    else if (types.c_str() == "RECEIVE")
+    {
+        event.type = ENET_EVENT_TYPE_RECEIVE;
+    }
+    else if (types.c_str() == "DISCONNECT")
+    {
+        event.type = ENET_EVENT_TYPE_DISCONNECT;
+    }
+    return enet_host_service(client, &event, time);
+}
+
+void Client::sendCardDataToServer(vector<string> cardSendList)
+{
+    string ID = to_string(getID());
+    for (string& cardPath : cardSendList)
+    {
+        cardPath += ID;
+        string Path = "2" + cardPath;
+        ENetPacket* packet = enet_packet_create(Path.c_str(), Path.length() + 1, ENET_PACKET_FLAG_RELIABLE);
+        enet_peer_send(peer, 0, packet);
+    }
+}
+
+void Client::sendDataWhenSkip()
+{
+    string message = "5aaaaaaaaaaaaaaaaaaaaaaaa5";
+    ENetPacket* packet = enet_packet_create(message.c_str(), message.length() + 1, ENET_PACKET_FLAG_RELIABLE);
+    enet_peer_send(peer, 0, packet);
+}
+
+void Client::Destroy()
+{
+    enet_peer_disconnect(peer, 0);
+
+    while (enet_host_service(client, &event, 3000) > 0)
+    {
+        switch (event.type)
+        {
+        case ENET_EVENT_TYPE_RECEIVE:
+            enet_packet_destroy(event.packet);
+            break;
+        case ENET_EVENT_TYPE_DISCONNECT:
+            cout << "DISCONECT TO SERVER.";
+            break;
+        }
+    }
+}
+
+string getPath(string String)
+{
     string temp;
-    for (auto it = String.begin() + 1; it != String.end() - 1;it++) {
+    for (auto it = String.begin() + 1; it != String.end() - 1;it++)
+    {
 
         temp += *it;
     }
     return temp;
-}
-
-int getID(string String) {
-    string temp;
-    for (auto it = String.begin() + 24; it != String.end();it++) {
-        if (isdigit(*it))
-        {
-            temp += *it;
-        }
-    }
-    int id = stoi(temp);
-    return id;
 }
 
 void printTurnText(int id)
@@ -147,20 +158,24 @@ void renderHistoryVer2(vector<string> history) {
     }
 }
 
-void multiplayer(Client client, User& player, vector<Computer>& computers, vector<string>& historyTemp) {
-        
-    char buffer[1024] = { '\0' };
+void Reset(SDL_Texture* background, User& player, vector<Computer> computers)
+{
+    SDL_RenderClear(gRenderer);
+    SDL_RenderCopy(gRenderer, backgroundTexture, NULL, NULL);
+    for (Computer computer : computers) {
+        computer.printBackCard();
+    }
+    player.printCards();
+}
 
+void multiplayer(Client client, User& player, vector<Computer>& computers, vector<string>& historyTemp) {
+   
     while (client.setHostService("RECEIVE", 50) > 0) {
+        char buffer[1024] = { '\0' };
         if (Count >= 3) {
             history.clear();
-            SDL_RenderClear(gRenderer);
-            SDL_RenderCopy(gRenderer, backgroundTexture, NULL, NULL);
-            for (Computer computer : computers) {
-                computer.printBackCard();
-            }
+            Reset(backgroundTexture, player, computers);
             historyTemp.clear();
-            player.printCards();
             SDL_RenderPresent(gRenderer);
             Distance = 90;
             Count = 0;
@@ -173,19 +188,18 @@ void multiplayer(Client client, User& player, vector<Computer>& computers, vecto
     }
     for (string& card : cardImage) {
         string Card = getPath(card);
-        int id = getID(card);
         string::iterator it = card.begin();
         if (*it == '2') {
             cout << "Receiving information from server.....VALID CARD, ready to print Card : " << Card << " on screen" << endl;
             historyTemp.push_back(Card);
-            SDL_Texture* temp = loadTexture(Card);
-            SDL_RenderCopy(gRenderer, temp, NULL, &destination[Count]);
+            SDL_RenderCopy(gRenderer, loadTexture(Card), NULL, &destination[Count]);
             printTurnText(check2);
             renderHistory(history);
             Count++;
-            SDL_RenderPresent(gRenderer);
+
         }
         else if (*it == '1' || *it == '3' || *it == '4') {
+           // Reset(backgroundTexture, player, computers);
             check1++;
             if (check1 == 1) {
                 check2++;
@@ -195,32 +209,26 @@ void multiplayer(Client client, User& player, vector<Computer>& computers, vecto
                 check2 = 0;
             }
             cout << "Receiving information from server.....VALID CARD, ready to print Card : " << Card << " on screen" << endl;
-            historyTemp.push_back(Card);
-            SDL_Texture* temp = loadTexture(Card);
-            SDL_RenderCopy(gRenderer, temp, NULL, &destination[Count]);
+            historyTemp.push_back(Card);      
+            SDL_RenderCopy(gRenderer, loadTexture(Card), NULL, &destination[Count]);
             printTurnText(check2);
             renderHistory(history);
-            Count++;          
-            SDL_RenderPresent(gRenderer);
+            Count++;
 
-        } 
+        }
         else if (*it == '5') {
-            SDL_RenderClear(gRenderer);
-            SDL_RenderCopy(gRenderer, backgroundTexture, NULL, NULL);
-            for (Computer computer : computers) {
-                computer.printBackCard();
-            }
-            player.printCards();
+            Reset(backgroundTexture, player, computers);
             renderHitBtn();
             renderSkipBtn();
+            renderHistoryVer2(History);
             check2++;
             if (check2 == 4) {
                 printMyTurnText();
                 check2 = 0;
             }
             printTurnText(check2);
-            SDL_RenderPresent(gRenderer);
         }
+        SDL_RenderPresent(gRenderer);
     }
     check1 = 0;
     // xoa bo nho dem 

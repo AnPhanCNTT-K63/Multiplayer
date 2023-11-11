@@ -36,7 +36,7 @@ int main(int argc, char* args[])
 
     // check for connect to server 
     bool isConnectToServer = false;
-    while (client.setHostService("CONNECT", 8000) > 0) {
+    while (client.setHostService("CONNECT", 10000) > 0) {
         cout << "CONNECTING TO SERVER SUCCEED!" << endl << "PLEASE WAIT FOR ANOTHER PLAYERS TO PLAY...." << endl;
         Sleep(4000);
         isConnectToServer = true;
@@ -92,7 +92,7 @@ int main(int argc, char* args[])
         againBtnTexture = loadTexture("src/image/again.png");
         printMyTurnText();
         renderHitBtn();       
-            renderSkipBtn();
+        renderSkipBtn();
         player.printCards();
         SDL_RenderPresent(gRenderer);            
         // game loop
@@ -143,6 +143,6 @@ int main(int argc, char* args[])
         // Free resources and close SDL
         close();
     }
-
-    return 0;
+    client.Destroy();
+    return EXIT_SUCCESS;
 }
