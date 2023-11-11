@@ -14,8 +14,7 @@ int Count = 0;
 int check1 = 0;
 int check2 = 0;
 
-
-class Client 
+class Client
 {
 
 private:
@@ -31,7 +30,7 @@ public:
     unsigned char* getPacketData() { return event.packet->data; }
 
     int getID() { return 1; } // CLIENT 1
-    
+
     void setPort(int portID) { address.port = portID; }
 
     void createHost() { client = enet_host_create(NULL, 1, 1, 0, 0); }
@@ -41,11 +40,11 @@ public:
     void setPeer() { peer = enet_host_connect(client, &address, 1, 0); }
 
     int setHostService(string types, int time);
-    
+
     void sendCardDataToServer(vector<string> cardSendList);
-    
+
     void sendDataWhenSkip();
-    
+
     void Destroy();
 };
 
@@ -66,7 +65,7 @@ int Client::setHostService(string types, int time)
     return enet_host_service(client, &event, time);
 }
 
-void Client::sendCardDataToServer(vector<string> cardSendList) 
+void Client::sendCardDataToServer(vector<string> cardSendList)
 {
     string ID = to_string(getID());
     for (string& cardPath : cardSendList)
@@ -97,7 +96,7 @@ void Client::Destroy()
             enet_packet_destroy(event.packet);
             break;
         case ENET_EVENT_TYPE_DISCONNECT:
-             cout <<"DISCONECT TO SERVER.";
+            cout << "DISCONECT TO SERVER.";
             break;
         }
     }
@@ -106,7 +105,7 @@ void Client::Destroy()
 string getPath(string String)
 {
     string temp;
-    for (auto it = String.begin() + 1; it != String.end()-1;it++)
+    for (auto it = String.begin() + 1; it != String.end() - 1;it++)
     {
 
         temp += *it;
@@ -170,13 +169,13 @@ void Reset(SDL_Texture* background, User& player, vector<Computer> computers)
 }
 
 void multiplayer(Client client, User& player, vector<Computer>& computers, vector<string>& historyTemp) {
-     
-    while (client.setHostService("RECEIVE", 50) > 0) {       
+
+    while (client.setHostService("RECEIVE", 100) > 0) {
         char buffer[1024] = { '\0' };
         if (Count >= 3) {
             history.clear();
-            Reset(backgroundTexture, player, computers);           
-            historyTemp.clear();           
+            Reset(backgroundTexture, player, computers);
+            historyTemp.clear();
             SDL_RenderPresent(gRenderer);
             Distance = 90;
             Count = 0;
@@ -187,7 +186,7 @@ void multiplayer(Client client, User& player, vector<Computer>& computers, vecto
         destination.push_back(temp);
         Distance += 90;
     }
-    for (string& card : cardImage) {     
+    for (string& card : cardImage) {
         string Card = getPath(card);
         string::iterator it = card.begin();
         if (*it == '1') {
@@ -196,12 +195,12 @@ void multiplayer(Client client, User& player, vector<Computer>& computers, vecto
             SDL_RenderCopy(gRenderer, loadTexture(Card), NULL, &destination[Count]);
             printTurnText(check2);
             renderHistory(history);
-            Count++;            
-             
-        } 
+            Count++;
+
+        }
         else if (*it == '2' || *it == '3' || *it == '4') {
-            Reset(backgroundTexture, player, computers);
-            check1++;        
+            // Reset(backgroundTexture, player, computers);
+            check1++;
             if (check1 == 1) {
                 check2++;
             }
@@ -209,14 +208,14 @@ void multiplayer(Client client, User& player, vector<Computer>& computers, vecto
                 printMyTurnText();
                 check2 = 0;
             }
-                cout << "Receiving information from server.....VALID CARD, ready to print Card : " << Card << " on screen" << endl;
-                historyTemp.push_back(Card);
-                SDL_RenderCopy(gRenderer, loadTexture(Card), NULL, &destination[Count]);
-                printTurnText(check2);               
-                renderHistory(history);
-                Count++;              
-            
-        }  
+            cout << "Receiving information from server.....VALID CARD, ready to print Card : " << Card << " on screen" << endl;
+            historyTemp.push_back(Card);
+            SDL_RenderCopy(gRenderer, loadTexture(Card), NULL, &destination[Count]);
+            printTurnText(check2);
+            renderHistory(history);
+            Count++;
+
+        }
         else if (*it == '5') {
             Reset(backgroundTexture, player, computers);
             renderHitBtn();
@@ -230,7 +229,7 @@ void multiplayer(Client client, User& player, vector<Computer>& computers, vecto
             printTurnText(check2);
         }
         SDL_RenderPresent(gRenderer);
-    }  
+    }
     check1 = 0;
     // xoa bo nho dem 
     cardImage.clear();

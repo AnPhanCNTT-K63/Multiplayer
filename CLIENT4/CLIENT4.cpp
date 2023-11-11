@@ -143,6 +143,6 @@ int main(int argc, char* args[])
         // Free resources and close SDL
         close();
     }
-
-    return 0;
+    client.Destroy();
+    return EXIT_SUCCESS;
 }

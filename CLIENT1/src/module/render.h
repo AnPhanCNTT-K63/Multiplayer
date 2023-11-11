@@ -81,6 +81,8 @@ void renderAnimationHit(vector<vector<Card>> history, User& player, vector<Compu
                     for (Card& card : history[i]) {
                         SDL_RenderCopy(gRenderer, card.getTexture(), NULL, card.getDestinationRect());
                     }
+
+
                     SDL_RenderPresent(gRenderer);
                     SDL_RenderCopy(gRenderer, backgroundTexture, NULL, NULL);
                     for (Computer& computer : computers) {

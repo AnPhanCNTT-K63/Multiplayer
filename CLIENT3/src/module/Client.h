@@ -171,7 +171,7 @@ void Reset(SDL_Texture* background, User& player, vector<Computer> computers)
 
 void multiplayer(Client client, User& player, vector<Computer>& computers, vector<string>& historyTemp) {
     
-    while (client.setHostService("RECEIVE", 50) > 0) {
+    while (client.setHostService("RECEIVE", 100) > 0) {
         char buffer[1024] = { '\0' };
         if (Count >= 3) {
             history.clear();

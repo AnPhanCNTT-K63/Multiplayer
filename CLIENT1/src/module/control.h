@@ -46,7 +46,7 @@ void renderSelectEvent(User player, vector<Computer> computers)
 
     SDL_RenderClear(gRenderer);
     SDL_RenderCopy(gRenderer, backgroundTexture, NULL, NULL);  
-    renderSkipBtn();
+        renderSkipBtn();
     renderHitBtn();
     renderHistory(history);
     renderHistoryVer2(History);
